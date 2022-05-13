@@ -17,6 +17,7 @@
                     <th>الكاشير</th>
                     <th> الفرع  </th>
                     <th>  تاريخ الفاتورة  </th>
+                    <th>تفاصيل الفاتورة</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,9 +29,18 @@
                         <td class="align-middle"> @invoice.CashierName </td>
                         <td class="align-middle"> @invoice.BranchName </td>
                         <td class="align-middle"> @invoice.InvoiceDate.ToShortDateString() </td>
+                        <td>
+                            @foreach(var invoiceDetail in invoice.InvoiceDetails)
+                            {
+                                <span>الصنف :  @invoiceDetail.ItemName - </span>
+                                <span>الكمية : @invoiceDetail.Quantity - </span>
+                                <span>السعر : @invoiceDetail.Price - </span>
+                                <span>قيمة : @invoiceDetail.TotalValue  </span>
+                                <p></p>
+                            }
+                        </td>
                         <td class="align-middle">
                             <a class="btn btn-outline-primary" asp-controller="Producers" asp-action="Edit" asp-route-id="@invoice.InvoiceId"><i class="bi bi-pencil-square"></i>Edit</a>
-                            <a class="btn btn-outline-info" asp-controller="Producers" asp-action="Details" asp-route-id="@invoice.InvoiceId"><i class="bi bi-eye"></i>Details</a>
                             <a class="btn btn-danger text-white" asp-controller="Producers" asp-action="Delete" asp-route-id="@invoice.InvoiceId"><i class="bi bi-trash"></i>Delete</a>
                         </td>
 

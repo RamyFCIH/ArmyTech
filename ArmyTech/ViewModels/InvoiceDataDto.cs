@@ -15,16 +15,18 @@ namespace ArmyTech.ViewModels
         [Display(Name = "العميل")]
         public string CustomerName { get; set; }
 
-
         [Display(Name = "الكاشير")]
         public string CashierName { get; set; }
 
         [Display(Name = "الفرع")]
         public string BranchName { get; set; }
 
+        public int CashierId { get; set; }
+        public int BranchId { get; set; }
 
         [Display(Name = "تاريخ الفاتورة")]
         public DateTime InvoiceDate { get; set; }
+        public List<InvoiceDetailDto> InvoiceDetails { get; set; }
 
     }
 
@@ -32,5 +34,14 @@ namespace ArmyTech.ViewModels
     {
         public IEnumerable<InvoiceDataDto> InvoiceData { get; set; }
         public AddNewItemDto AddNewItemDto { get; set; }
+    }
+
+    public class InvoiceDetailDto
+    {
+        public string ItemName { get; set; }
+        public double Quantity { get; set; }
+        public double Price { get; set; }
+        public double TotalValue { get; set; }
+
     }
 }

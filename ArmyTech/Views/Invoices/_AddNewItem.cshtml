@@ -2,69 +2,184 @@
 
 <div class="row text" dir="rtl">
     <div class="col">
-
         <p>
             <h1>إضافة فاتورة جديدة </h1>
         </p>
         <div class="row">
             <div class="col">
-                <form asp-action="Create" dir="rtl">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="CustomerName" class="control-label"></label>
+                    <input asp-for="CustomerName" class="form-control" />
+                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                </div>
+            </div>
 
-                    <div class="col">
-                        <div class="form-group">
-                            <label asp-for="CustomerName" class="control-label"></label>
-                            <input asp-for="CustomerName" class="form-control" />
-                            <span asp-validation-for="CustomerName" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label asp-for="ItemName" class="control-label"></label>
-                            <input asp-for="ItemName" class="form-control" />
-                            <span asp-validation-for="ItemName" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-group">
-                            <label asp-for="Quantity" class="control-label"></label>
-                            <input asp-for="Quantity" class="form-control" />
-                            <span asp-validation-for="Quantity" class="text-danger"></span>
-                        </div>
-                    </div>
+            <div class="col">
+                <label class=""> الفرع</label>
+                <select class="form-control" asp-for="BranchId" asp-items="Model.Branches.ToList()"><option selected disabled value="0">--برجاء اختيار الفرع--</option></select>
+                <span class="text-danger" asp-validation-for="BranchId" style="display: flex;"></span>
+            </div>
+            <div class="col">
+                <label class=""> الكاشير</label>
+                <select class="form-control" asp-for="CashierId" asp-items="Model.Cashiers.ToList()"><option selected disabled value="0">--برجاء اختيار الكاشير--</option></select>
+                <span class="text-danger" asp-validation-for="CashierId" style="display: flex;"></span>
+            </div>
 
-                    <div class="col">
-                        <div class="form-group">
-                            <label asp-for="Price" class="control-label"></label>
-                            <input asp-for="Price" class="form-control" />
-                            <span asp-validation-for="Price" class="text-danger"></span>
-                        </div>
-                    </div>
+        </div>
 
-                    <div class="col">
-                        <label class="">نقاط البيع</label>
-                        <select class="form-control" asp-for="BranchId" asp-items="Model.Branches.ToList()"><option selected disabled value="0">--برجاء اختيار الفرع--</option></select>
-                        <span class="text-danger" asp-validation-for="BranchId" style="display: flex;"></span>
-                    </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="ItemName" class="control-label"></label>
+                    <input asp-for="ItemName" class="form-control" />
+                    <span asp-validation-for="ItemName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="Quantity" class="control-label"></label>
+                    <input asp-for="Quantity" class="form-control" />
+                    <span asp-validation-for="Quantity" class="text-danger"></span>
+                </div>
+            </div>
 
-
+            <div class="col">
+                <div class="form-group">
+                    <label asp-for="Price" class="control-label"></label>
+                    <input asp-for="Price" class="form-control" />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+                <div class="col">
                     <div class="form-group">
-                        <input type="submit" value="إضافة" class="btn btn-outline-success float-right" />
+                        <button type="button" class="btn btn-primary" id="AddNewItem">إضافة الصنف</button>
+                        <input type="submit" value="حفظ الفاتورة" id="SaveInvoice" class="btn btn-outline-success float-right" />
                     </div>
-                </form>
+                </div>
 
             </div>
+
+        </div>
+
+        <div class="row">
+            <table id="ItemsTable" class="table" dir="rtl">
+                <thead>
+                    <tr class="text-center">
+                        <th>الصنف</th>
+                        <th> الكمية </th>
+                        <th>السعر</th>
+                        <th> قيمة  </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
+
 </div>
 
-@section Scripts {
+<script src="~/lib/jquery/dist/jquery.js"></script>
 <script>
 
       $(document).ready(function(){
           debugger;
+          var validationCount = 0;
+          var InputsEnteredObject = null;
+          $("#AddNewItem").on("click",function(){
+              debugger;
+              ValidateInputs();
+              if( validationCount ==0) {
+                  GetInputs();
+                  AddNewItem();
+              }
+          });
+
+          function ValidateInputs() {
+              GetInputs();
+              if(InputsEnteredObject.customerName == "") {
+              alert("يرجى ادخال اسم العميل");
+              validationCount = 1;
+              return false;
+              }
+              if(InputsEnteredObject.itemName == "") {
+               alert("يرجى ادخال اسم الصنف");
+                validationCount = 1;
+               return false;
+              }
+              if(InputsEnteredObject.cashierId == null) {
+               alert("يرجى اختيار الكاشير");
+                validationCount = 1;
+               return false;
+              }
+              if(InputsEnteredObject.branchId == null) {
+               alert("يرجى اختيار الفرع");
+                validationCount = 1;
+               return false;
+              }
+              if(InputsEnteredObject.quantity <=0) {
+               alert("يرجى ادخال  الكمية بقيمة اكبر من الصفر");
+                validationCount = 1;
+               return false;
+              }
+               if(InputsEnteredObject.price <=0) {
+               alert("يرجى ادخال  السعر بقيمة اكبر من الصفر");
+                validationCount = 1;
+               return false;
+              }else {
+                      validationCount = 0;
+              }
+          }
+
+          function GetInputs(){
+              var customerName = $("#CustomerName").val();
+              var itemName = $("#ItemName").val();
+              var cashierId = $("#CashierId").val();
+              var branchId = $("#BranchId").val();
+              var quantity = $("#Quantity").val();
+              var price  = $("#Price").val();
+
+              InputsEnteredObject = {
+                customerName : customerName,
+                ItemName : itemName,
+                cashierId : cashierId,
+                branchId : branchId,
+                quantity : quantity,
+                price : price
+              };
+          }
+
+          function AddNewItem() {
+          $("#ItemsTable").append('<tr><td>' + InputsEnteredObject.ItemName  + '</td><td>' + InputsEnteredObject.quantity  + '</td><td>' + InputsEnteredObject.price  + '</td><td>' + parseFloat(InputsEnteredObject.quantity) * parseFloat(InputsEnteredObject.price)  + '</td></tr>');
+          }
+
+
+          $("#SaveInvoice").on("click",function(){
+              debugger;
+             var sendObject = {
+               customerName : InputsEnteredObject.customerName,
+               cashierId : InputsEnteredObject.cashierId,
+               branchId : InputsEnteredObject.branchId
+              }
+
+           $("#ItemsTable").closest('tr').find('td').each(function() {
+               debugger;
+        var textval = $(this).text();
+        alert(textval)// this will be the text of each <td>
+   });
+
+        //    $.ajax({
+        //    url: "/Invoices/Save",
+        //    type: 'POST',
+        //    data: {
+        //        model:sendObject
+        //    },
+        //    success: function (result) {
+        //    },
+        //    error: function (result) {
+        //    }
+        //});
+          });
 
     });
 
 </script>
-}

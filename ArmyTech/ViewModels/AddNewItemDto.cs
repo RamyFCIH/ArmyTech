@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace ArmyTech.ViewModels
@@ -35,7 +36,7 @@ namespace ArmyTech.ViewModels
         public string BranchName { get; set; }
 
         // Lists
-        public List<BranchDto> Branches { get; set; }
-        public List<CashierDto> Cashiers { get; set; }
+        public List<SelectListItem> Branches { get; set; }
+        public List<SelectListItem> Cashiers { get; set; }
     }
 }
