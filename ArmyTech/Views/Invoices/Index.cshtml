@@ -9,7 +9,7 @@
 
 <div cla ss="row">
     <div class="col">
-        <table class="table" dir="rtl">
+        <table class="table table-striped table-bordered" dir="rtl">
             <thead>
                 <tr class="text-center">
                     <th>كود الفاتورة</th>
@@ -30,7 +30,7 @@
                         <td class="align-middle"> @invoice.BranchName </td>
                         <td class="align-middle"> @invoice.InvoiceDate.ToShortDateString() </td>
                         <td>
-                            @foreach(var invoiceDetail in invoice.InvoiceDetails)
+                            @foreach (var invoiceDetail in invoice.InvoiceDetails)
                             {
                                 <span>الصنف :  @invoiceDetail.ItemName - </span>
                                 <span>الكمية : @invoiceDetail.Quantity - </span>
@@ -40,8 +40,8 @@
                             }
                         </td>
                         <td class="align-middle">
-                            <a class="btn btn-outline-primary" asp-controller="Producers" asp-action="Edit" asp-route-id="@invoice.InvoiceId"><i class="bi bi-pencil-square"></i>Edit</a>
-                            <a class="btn btn-danger text-white" asp-controller="Invoices" asp-action="Delete" asp-route-id="@invoice.InvoiceId"><i class="bi bi-trash"></i>Delete</a>
+                             <button id="Edit" class="btn btn-primary" value="@invoice.InvoiceId">تعديل</button>
+                            <button id="Delete" class="btn btn-danger" value="@invoice.InvoiceId">حذف</button>
                         </td>
 
                     </tr>
@@ -60,23 +60,67 @@
 <script src="~/lib/jquery/dist/jquery.js"></script>
 <script>
 
+       $(document).unbind('click').on('click', '#Delete', function (event) {
+                debugger;
+                var invoiceId = parseFloat($(this).attr("value"));
+             $.ajax({
+            url: "/Invoices/Delete",
+            type: 'POST',
+            data: {
+                id:invoiceId
+            },
+            success: function (result) {
+                debugger;
+              if(result.success) {
+             var target = event.target;
+            var parentTr = $(target).closest('tr');
+            $(parentTr).remove();
+            }else {
+            alert(result.message);
+            }
+            },
+            error: function (result) {
+                   alert(result.message);
+            }
+        });
+        });
+
       $(document).ready(function(){
           debugger;
-          $("#Delete").on("click",function(){
-              debugger;
-        //    $.ajax({
-        //    url: "/Invoices/Save",
-        //    type: 'POST',
-        //    data: {
-        //        model:sendObject
-        //    },
-        //    success: function (result) {
-        //    },
-        //    error: function (result) {
-        //    }
-        //});
-          });
+         
+
+
+         $(document).unbind('click').on('click', '#Edit', function (event) {
+                debugger;
+                var invoiceId = parseFloat($(this).attr("value"));
+             $.ajax({
+            url: "/Invoices/Edit",
+            type: 'GET',
+            data: {
+                id:invoiceId
+            },
+            success: function (result) {
+                debugger;
+                var response = result.data;
+               $("#CustomerName").val(response.customerName);
+               $("#BranchId").val(response.branchId);
+                $("#CashierId").val(response.cashierId);
+                $("#InvoiceId").val(response.invoiceId);
+              
+                for(var i = 0 ; i < response.invoiceDetails.length;i++) {
+                    var tr = '<tr><td><input type="text" readonly class="form-control" value="' + response.invoiceDetails[i].itemName + '" name="InvoiceDetails[' + i + '].ItemName"/></td><td><input type="text" readonly class="form-control" name="InvoiceDetails[' + i + '].Quantity" value="' + response.invoiceDetails[i].quantity + '  "/></td><td><input type="text" readonly class="form-control" name="InvoiceDetails[' + i + '].Price" value="' + response.invoiceDetails[i].price + '  "/></td><td><input type="text" readonly class="form-control" name="InvoiceDetails[' + i + '].TotalValue" value="' + response.invoiceDetails[i].totalValue + '  "/></td><td><button type="button" id="DeleteItem" href="#" class="btn btn-danger col-lg-12" style="margin-top:5px; margin-right:5px;">حذف</button></td></tr>';
+                $('#ItemsTable').prepend(tr);
+                ItemsCount++;
+                }
+            },
+            error: function (result) {
+               
+            }
+        });
+        });
 
     });
+
+
 
 </script>

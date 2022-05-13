@@ -8,29 +8,21 @@ namespace ArmyTech.ViewModels
     {
         public long InvoiceId { get; set; }
 
-        // integers
-
-        [Display(Name ="الكمية")]
-        public int Quantity { get; set; }
-
         [Display(Name = "الفرع")]
+
+        [Required(ErrorMessage = "من فضلك اختر الفرع")]
         public int BranchId { get; set; }
 
         [Display(Name = "الكاشير")]
+        [Required(ErrorMessage = "من فضلك اختر الكاشير")]
         public int CashierId { get; set; }
       
-  
-
-        [Display(Name = "السعر")]
-        public decimal Price { get; set; }
 
         // strings
 
         [Display(Name = "العميل")]
+        [Required(ErrorMessage = "من فضلك ادخل اسم العميل")]
         public string CustomerName { get; set; }
-
-        [Display(Name = "الصنف")]
-        public string ItemName { get; set; }
 
         public string CashierName { get; set; }
         public string BranchName { get; set; }

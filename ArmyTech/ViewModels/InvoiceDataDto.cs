@@ -13,6 +13,7 @@ namespace ArmyTech.ViewModels
 
 
         [Display(Name = "العميل")]
+        [Required(ErrorMessage ="من فضلك ادخل اسم العميل")]
         public string CustomerName { get; set; }
 
         [Display(Name = "الكاشير")]
@@ -21,7 +22,10 @@ namespace ArmyTech.ViewModels
         [Display(Name = "الفرع")]
         public string BranchName { get; set; }
 
+        [Required(ErrorMessage = "من فضلك اختر الكاشير")]
         public int CashierId { get; set; }
+
+        [Required(ErrorMessage = "من فضلك اختر الفرع")]
         public int BranchId { get; set; }
 
         [Display(Name = "تاريخ الفاتورة")]

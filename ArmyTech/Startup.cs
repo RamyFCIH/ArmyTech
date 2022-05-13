@@ -1,4 +1,6 @@
+using ArmyTech.Interfaces;
 using ArmyTech.Models;
+using ArmyTech.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,7 +29,9 @@ namespace ArmyTech
         {
             services.AddControllersWithViews();
             services.AddDbContext<ArmyTechTaskContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
+            services.AddScoped<IDatabaseTransaction, DatabaseTransaction>();
+            services.AddScoped<IInvoiceHeaderService, InvoiceHeaderService>();
+            services.AddScoped<IInvoiceDetailService, InvoiceDetailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

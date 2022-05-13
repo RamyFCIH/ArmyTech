@@ -1,4 +1,5 @@
-﻿using ArmyTech.Models;
+﻿using ArmyTech.Interfaces;
+using ArmyTech.Models;
 using ArmyTech.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -11,108 +12,78 @@ namespace ArmyTech.Controllers
     public class InvoicesController : Controller
     {
 
-        private readonly ArmyTechTaskContext _context;
-        public InvoicesController(ArmyTechTaskContext context)
+        private readonly IDatabaseTransaction _transaction;
+        private readonly IInvoiceHeaderService _invoiceheaderService;
+        private readonly IInvoiceDetailService _invoicedetailService;
+        public InvoicesController( IDatabaseTransaction transaction, IInvoiceHeaderService invoiceHeaderService, IInvoiceDetailService invoiceDetailService)
         {
-            _context = context;
+            _invoicedetailService = invoiceDetailService;
+            _invoiceheaderService = invoiceHeaderService;
+            _transaction = transaction;
         }
         public IActionResult Index()
         {
-            var invoices = (from invoiceHeader in _context.InvoiceHeaders.AsQueryable()
-                            from Branch in _context.Branches.AsQueryable().Where(x => x.Id == invoiceHeader.BranchId)
-                            from cashier in _context.Cashiers.AsQueryable().Where(x => x.Id == invoiceHeader.CashierId)
-                            select new InvoiceDataDto
-                            {
-                                InvoiceId = invoiceHeader.Id,
-                                BranchName = Branch.BranchName,
-                                CashierName = cashier.CashierName,
-                                CustomerName = invoiceHeader.CustomerName,
-                                InvoiceDate = invoiceHeader.Invoicedate
-                            }).ToList();
-
-            foreach (var invoice in invoices)
-            {
-                var invoiceDetails = _context.InvoiceDetails.Where(x => x.InvoiceHeaderId == invoice.InvoiceId).Select(x => new InvoiceDetailDto
-                {
-                    ItemName = x.ItemName,
-                    Price = x.ItemPrice,
-                    Quantity = x.ItemCount,
-                    TotalValue = Math.Round(x.ItemPrice * x.ItemCount, 2)
-                }).ToList();
-                invoice.InvoiceDetails = invoiceDetails;
-            }
-            var model = new InvoiceMainDataDto
-            {
-                InvoiceData = invoices.ToList(),
-                AddNewItemDto = GetNewItemData()
-            };
+            var model = GetIndexModel();
             return View(model);
         }
 
+        [HttpGet]
+        public ActionResult Edit(int id)
+        {
+            var model = _invoicedetailService.GetEditModel(id);
+            return Json(new { data = model });
+        }
 
         [HttpPost]
         public IActionResult Save(InvoiceDataDto model)
         {
+
+            var successModel = new SuccessMessageDto();
             try
             {
-                var invoiceHeader = new InvoiceHeader
+                if (ModelState.IsValid)
                 {
-                    CustomerName = model.CustomerName,
-                    Invoicedate = DateTime.Now,
-                    CashierId = model.CashierId,
-                    BranchId = model.BranchId
-                };
-                _context.InvoiceHeaders.Add(invoiceHeader);
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-
-            }
-            return RedirectToAction("Index", "Invoices");
-        }
-
-        [HttpDelete]
-        public IActionResult Delete(int id)
-        {
-            try
-            {
-                var invoice = _context.InvoiceHeaders.Where(x => x.Id == id).FirstOrDefault();
-                var invoiceDetails = _context.InvoiceDetails.Where(x => x.InvoiceHeaderId == invoice.Id).ToList();
-                if (invoice != null && invoiceDetails != null)
-                {
-                    _context.InvoiceDetails.RemoveRange(invoiceDetails);
-                    _context.InvoiceHeaders.Remove(invoice);
-                    _context.SaveChanges();
+                    successModel = _invoicedetailService.SaveInvoice(model);
+                    _transaction.Commit();
+                }
+                else {
+                    return View("Index", GetIndexModel());
                 }
             }
             catch (Exception e)
             {
-
+                _transaction.Rollback();
             }
-            return RedirectToAction("Index", "Invoices");
+            return View("Index", GetIndexModel());
         }
 
-        private AddNewItemDto GetNewItemData()
+        [HttpPost]
+        public IActionResult Delete(int id)
         {
-            var branches = _context.Branches.Select(x => new SelectListItem
+            var successModel = new SuccessMessageDto();
+            try
             {
-                Text = x.BranchName,
-                Value = x.Id.ToString()
-            }).ToList();
-            var cashiers = _context.Cashiers.Select(x => new SelectListItem
+                successModel = _invoicedetailService.DeleteInvoice(id);
+                _transaction.Commit();
+            }
+            catch (Exception e)
             {
-                Text = x.CashierName,
-                Value = x.Id.ToString()
-            }).ToList();
-            var model = new AddNewItemDto
+                _transaction.Rollback();
+                successModel.Success = false;
+                successModel.Message = "حدث خطأ اثناء حذف الفاتورة";
+            }
+            return Json(new { success = successModel.Success, message = successModel.Message });
+        }
+
+        private InvoiceMainDataDto GetIndexModel() {
+            var invoices = _invoiceheaderService.GetAllInvoices();
+            var model = new InvoiceMainDataDto
             {
-                Branches = branches,
-                Cashiers = cashiers,
-                Price = 0,
-                Quantity = 0
+                InvoiceData = _invoicedetailService.GetInvoicesDetails(invoices),
+                AddNewItemDto = _invoiceheaderService.GetNewInvoiceData()
             };
             return model;
         }
+
     }
 }
