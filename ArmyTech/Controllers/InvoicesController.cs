@@ -69,7 +69,28 @@ namespace ArmyTech.Controllers
             {
 
             }
-            return RedirectToAction("Index","Invoices");
+            return RedirectToAction("Index", "Invoices");
+        }
+
+        [HttpDelete]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                var invoice = _context.InvoiceHeaders.Where(x => x.Id == id).FirstOrDefault();
+                var invoiceDetails = _context.InvoiceDetails.Where(x => x.InvoiceHeaderId == invoice.Id).ToList();
+                if (invoice != null && invoiceDetails != null)
+                {
+                    _context.InvoiceDetails.RemoveRange(invoiceDetails);
+                    _context.InvoiceHeaders.Remove(invoice);
+                    _context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+
+            }
+            return RedirectToAction("Index", "Invoices");
         }
 
         private AddNewItemDto GetNewItemData()

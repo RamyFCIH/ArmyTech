@@ -41,7 +41,7 @@
                         </td>
                         <td class="align-middle">
                             <a class="btn btn-outline-primary" asp-controller="Producers" asp-action="Edit" asp-route-id="@invoice.InvoiceId"><i class="bi bi-pencil-square"></i>Edit</a>
-                            <a class="btn btn-danger text-white" asp-controller="Producers" asp-action="Delete" asp-route-id="@invoice.InvoiceId"><i class="bi bi-trash"></i>Delete</a>
+                            <a class="btn btn-danger text-white" asp-controller="Invoices" asp-action="Delete" asp-route-id="@invoice.InvoiceId"><i class="bi bi-trash"></i>Delete</a>
                         </td>
 
                     </tr>
@@ -56,3 +56,27 @@
 
 
 
+
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script>
+
+      $(document).ready(function(){
+          debugger;
+          $("#Delete").on("click",function(){
+              debugger;
+        //    $.ajax({
+        //    url: "/Invoices/Save",
+        //    type: 'POST',
+        //    data: {
+        //        model:sendObject
+        //    },
+        //    success: function (result) {
+        //    },
+        //    error: function (result) {
+        //    }
+        //});
+          });
+
+    });
+
+</script>
